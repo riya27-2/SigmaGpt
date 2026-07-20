@@ -1,20 +1,20 @@
 import express from "express";
 import "dotenv/config";
-import cors from"cors";
+import cors from "cors";
 
-
-const app= express();
-const PORT=8080;
+const app = express();
+const PORT = 8080;
 
 app.use(express.json());
 app.use(cors());
 
-app.listen(PORT,()=>{
+app.listen(PORT, () => {
     console.log(`app is listening on ${PORT}`);
-})
+});
 
 app.post("/test", async (req, res) => {
-    const userMessage = req.body.messages || "Hello!";
+    // FIX 1: was req.body.messages (plural) — client sends "message" (singular)
+    const userMessage = req.body.message || "Hello!";
 
     const options = {
         method: "POST",
@@ -33,19 +33,35 @@ app.post("/test", async (req, res) => {
     };
 
     try {
-        
+        // Confirmed via ListModels: gemini-3.5-flash is available and
+        // supports generateContent for this account
         const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
-    options
-);
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
+            options
+        );
+
         const data = await response.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "No response";
-         //console.log(reply);
+
+        // FIX 3: fail loudly on bad model name / API errors instead of
+        // silently returning "No response"
+        if (!response.ok) {
+            console.error("Gemini API error:", data);
+            return res.status(response.status).send({
+                error: data.error?.message || "Gemini API request failed",
+            });
+        }
+
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!reply) {
+            console.error("Unexpected Gemini response shape:", JSON.stringify(data));
+            return res.status(502).send({ error: "No reply returned from Gemini" });
+        }
 
         return res.send({ reply });
 
     } catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).send({ error: err.message });
     }
 });
