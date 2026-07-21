@@ -1,48 +1,29 @@
 import "dotenv/config";
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+});
 
 const getGeminiAPIResponse = async (message) => {
-    const userMessage = message || "Hello!";
-
-    const options = {
-        method: "POST",
-        headers: {
-            "content-type": "application/json",
-            "x-goog-api-key": process.env.GEMINI_API_KEY
+  try {
+    const completion = await client.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "user",
+          content: message,
         },
-        body: JSON.stringify({
-            contents: [
-                {
-                    role: "user",
-                    parts: [{ text: userMessage }]
-                }
-            ]
-        })
-    };
+      ],
+      temperature: 0.7,
+    });
 
-    // Confirmed via ListModels: gemini-3.5-flash is available and
-    // supports generateContent for this account
-    const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
-        options
-    );
-
-    const data = await response.json();
-
-    // Fail loudly on bad model name / API errors instead of
-    // silently returning "No response"
-    if (!response.ok) {
-        console.error("Gemini API error:", data);
-        throw new Error(data.error?.message || "Gemini API request failed");
-    }
-
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!reply) {
-        console.error("Unexpected Gemini response shape:", JSON.stringify(data));
-        throw new Error("No reply returned from Gemini");
-    }
-
-    return reply;
+    return completion.choices[0].message.content;
+  } catch (err) {
+    console.error(err);
+    throw new Error("Groq API request failed");
+  }
 };
 
 export default getGeminiAPIResponse;
