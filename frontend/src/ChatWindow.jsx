@@ -6,11 +6,13 @@ import {ScaleLoader} from "react-spinners";
 
 function ChatWindow() {
 
-const {prompt,setPrompt,reply,setReply, currThreadId, prevchats, setPrevchats}= useContext(MyContext);
+const {prompt,setPrompt,reply,setReply, currThreadId, prevchats, setPrevchats, setnewChats}= useContext(MyContext);
 const[loading, setLoading]=useState(false);
+const [isOpen, setisOpen]=useState(false);
 
 const getReply =async()=>{
   setLoading(true);
+  setnewChats(false);
   console.log("message",prompt,"threadId", currThreadId);
   const Options={
     method:"POST",
@@ -49,16 +51,29 @@ setPrompt("");
 },[reply])
 
 
+const handleprofileClick =()=>{
+  setisOpen(!isOpen);
+}
+
   return (
     <div className="chatWindow">
       <div className="navbar">
         <span>SigmaGPT&nbsp;<i className="fa-solid fa-angle-down"></i></span>
-        <div className="userIconDiv">
+        <div className="userIconDiv" onClick={handleprofileClick}>
          <span><i className="fa-solid fa-user"></i></span> 
 
         </div>
-
+       
       </div>
+      {
+        isOpen && 
+        <div className="dropDown">
+          <div className="dropDownItem"><i class="fa-solid fa-cloud-arrow-up"></i>&nbsp;Upgrade Plan</div>
+          <div className="dropDownItem"><i class="fa-solid fa-gear"></i>&nbsp;settings</div>
+          <div className="dropDownItem"><i class="fa-solid fa-arrow-right-from-bracket"></i>&nbsp;logout</div>
+
+        </div>
+      }
       <Chat></Chat>
      <ScaleLoader color="#fff" loading={loading}></ScaleLoader>
 

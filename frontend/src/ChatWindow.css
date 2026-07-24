@@ -97,7 +97,7 @@ input:focus {
 
 /* dropdown css */
 
-/* .dropDown {
+ .dropDown {
     position: absolute;
     top: 4rem;
     right: 4rem;
@@ -116,10 +116,10 @@ input:focus {
     margin: 0.3rem 0rem;
     padding: 0.5rem 0.2rem;
     cursor: pointer;
-} */
+} 
 
 
-/* .dropDownItem:hover {
+ .dropDownItem:hover {
     background-color: rgba(180, 180, 180, 0.1);
     border-radius: 6px;
-} */ 
+} 

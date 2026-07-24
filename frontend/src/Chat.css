@@ -1,7 +1,20 @@
 .chats {
     max-width: 700px;
-    overflow-y: scroll;
-    padding: 8rem;
+    height: calc(100vh - 180px);
+    overflow-y: auto;
+    padding: 1rem;
+    margin: 0 auto;
+}
+.chats::-webkit-scrollbar-track {
+    background: #202123;
+}
+
+.chats::-webkit-scrollbar-thumb {
+    background: #212124;
+}
+
+.chats::-webkit-scrollbar-thumb:hover {
+    background: #1d1d20;
 }
 
 .userDiv {
