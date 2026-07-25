@@ -26,10 +26,13 @@ router.get("/thread",async(req , res)=>{
     try{
   const threads= await Thread.find({}).sort({updatedAt:-1});
   res.json(threads);
-    }catch(err){
-        console.log(err);
-    res.status(500).json({error: "Failed to save in DB"});
-    }
+    }catch (err) {
+    console.error("THREAD ERROR:", err);
+    return res.status(500).json({
+        error: err.message,
+        stack: err.stack
+    });
+}
 });
 
 //fetch chat id
